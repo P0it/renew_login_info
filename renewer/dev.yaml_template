@@ -1,0 +1,33 @@
+devices:
+
+  OL_L3_48T:
+    type: switch
+    os: iosxe
+    alias: 10.10.249.20
+    connections:
+      cli:
+        protocol: ssh
+        ip: 10.10.249.20
+        port: 22
+    credentials:
+      default:
+        username: labor
+        password: P@ss0rd
+      enable:
+        password: OldBoy!(&&
+
+  2F_WG_L2_24P_02: 
+    type: switch
+    os: iosxe
+    alias: 10.10.250.22
+    connections:
+      cli:
+        protocol: ssh
+        ip: 10.10.250.22
+        port: 22
+    credentials:
+      default:
+        username: labor
+        password: P@ss0rd
+      enable:
+        password: OldBoy!(&&
