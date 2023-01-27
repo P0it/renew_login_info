@@ -40,18 +40,17 @@ def renew_login():
         else:
             pass
 
-    with open('src/dev.yaml_template') as f:
+    with open('src/dev.yaml') as f:
         list_doc = yaml.safe_load(f)
         device_list = list_doc['devices']
+        print(list_doc)
+        print(list_doc['devices']['OL_L3_48T']['type'])
 
-    for device in device_list:
+        # list_doc['devices']['OL_L3_48T']['type'] = 'router'
 
-        if device == "OL_L3_48T":
-            pass
-        # device['type'] = "router"
-
-    with open('src/dev.yaml_template', "w") as f:
+    with open("src/dev.yaml", "w") as f:
         yaml.dump(list_doc, f)
+        print("수정완료")
 
 
 # 메인 실행 함수
