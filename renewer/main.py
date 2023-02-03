@@ -1,74 +1,92 @@
+import csv
 import pandas as pd
 import yaml
 import sys
-from device import DeviceInfo
 
 
-# class( inherit )
-class FirstDevice(DeviceInfo):
-    pass
-
-
-class SecondDevice(DeviceInfo):
-    pass
-
-
-def renew_login():
-    # csv 파일 읽기
+def renew_data():
+    # import csv file
     data = pd.read_csv(file_path)
     print(data)
 
-    # 클래스 생성자 초기화
-    fd = FirstDevice()
-    sd = SecondDevice()
-    # 갱신 정보 객체에 저장
-    for item in data.values:
-        if item[0] == '10.10.249.20':
-            fd.set_host(item[1])
-            fd.set_port(item[2])
-            fd.set_id(item[3])
-            fd.set_pwd(item[4])
-            fd.set_enable(item[5])
+    with open('dev.yaml', 'r') as read_file:
+        # convert yaml into dic
+        contents = yaml.safe_load(read_file)
+        device_list = contents['devices']
+        # convert dic into 'list' to access by index
+        index_list = list(device_list)
+        # print(index_list)
+        for index in index_list:
+            for datum in data.values:
+                # check device
+                if pd.isna(datum[1]):
+                    pass
+                else:
+                    if datum[1] == index:
+                        if pd.isna(datum[0]):
+                            pass
+                        else:
+                            contents['devices'][index]['alias'] = datum[0]
+                            contents['devices'][index]['connections']['cli']['ip'] = datum[0]
+                        if pd.isna(datum[2]):
+                            pass
+                        else:
+                            contents['devices'][index]['connections']['cli']['port'] = datum[2]
+                        if pd.isna(datum[3]):
+                            pass
+                        else:
+                            contents['devices'][index]['credentials']['default']['username'] = datum[3]
+                        if pd.isna(datum[4]):
+                            pass
+                        else:
+                            contents['devices'][index]['credentials']['default']['password'] = datum[4]
+                        if pd.isna(datum[5]):
+                            pass
+                        else:
+                            contents['devices'][index]['credentials']['enable']['password'] = datum[5]
 
-        if item[0] == '10.10.250.22':
-            sd.set_host(item[1])
-            sd.set_port(item[2])
-            sd.set_id(item[3])
-            sd.set_pwd(item[4])
-            sd.set_enable(item[5])
+        with open('dev.yaml', 'w') as dump_file:
+            # print(contents)
+            yaml.dump(contents, dump_file)
 
-        else:
-            pass
 
-    with open('src/dev.yaml') as f:
-        list_doc = yaml.safe_load(f)
-        device_list = list_doc['devices']
-        print(list_doc)
-        print(list_doc['devices']['OL_L3_48T']['type'])
+def extract_csv():
+    with open('dev.yaml', 'r') as read_file:
+        # convert yaml into dic
+        contents = yaml.safe_load(read_file)
+        print(contents)
+        device_list = contents['devices']
+        # convert dic into 'list' to access by index
+        index_list = list(device_list)
+        data = []
+        for index in index_list:
+            row_data = [contents['devices'][index]['alias'],
+                        index,
+                        contents['devices'][index]['connections']['cli']['port'],
+                        contents['devices'][index]['credentials']['default']['username'],
+                        contents['devices'][index]['credentials']['default']['password'],
+                        contents['devices'][index]['credentials']['enable']['password']
+                        ]
+            data.append(row_data)
 
-        # list_doc['devices']['OL_L3_48T']['type'] = 'router'
+    header = ['ip', 'hostname', 'ssh_port', 'ssh_id', 'ssh_pwd', 'enable']
 
-    with open("src/dev.yaml", "w") as f:
-        yaml.dump(list_doc, f)
-        print("수정완료")
+    with open('login_info.csv', 'w', encoding='UTF-8', newline='') as write_csv:
+        writer = csv.writer(write_csv)
+
+        writer.writerow(header)
+        writer.writerows(data)
 
 
 # 메인 실행 함수
 if len(sys.argv) < 2:
-    print("--- Downloading ---")
-    # TODO file_path 테스트 후에 삭제
-    file_path = 'src/test.csv'
-    renew_login()
-    # method: yaml -> csv
-
+    extract_csv()
+    print('--- Downloaded! ---')
 
 elif len(sys.argv) == 2:
-    print("--- Renewing ---")
-    # method: csv -> yaml
-    # TODO file_path 테스트 후에 원복
-    # file_path = sys.argv[1]
-    file_path = 'src/test.csv'
-    renew_login()
+    file_path = sys.argv[1]
+    renew_data()
+    print("--- Renewed! ---")
 
 else:
     print("Only single csv file is required.")

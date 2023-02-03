@@ -1,3 +1,0 @@
-ip,hostname,ssh_port,ssh_id,ssh_pwd,enable
-10.10.249.20,OL_L3_48T,22,labor,P@ss0rd,OldBoy!(&&
-10.10.250.22,2F_WG_L2_24P_02,22,labor,P@ss0rd,OldBoy!(&&
